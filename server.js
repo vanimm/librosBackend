@@ -12,10 +12,7 @@ app.use(cors({
   credentials: true,
 }));
 
-// Permite recibir JSON en el body de las peticiones (POST / PUT)
 app.use(express.json());
-
-// Todas las rutas de libros empiezan con /libros
 app.use("/libros", librosRoutes);
 
 app.listen(PORT, () => {
