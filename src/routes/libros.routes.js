@@ -35,7 +35,7 @@ router.get("/:id", obtenerLibroPorId);
 router.post("/", crearLibro);
 router.put("/:id", actualizarLibro);
 router.patch("/:id", actualizarLibroParcial);
-// guia-seguimiento-diapositivas-ordenada.pdf
+// router.delete("/:id", eliminarLibro);
 router.delete("/:id", validarJwt, eliminarLibro);
 
 module.exports = router;
