@@ -8,7 +8,7 @@ No hay frontend: todo se prueba con **Postman**.
 
 ## A. Qué estamos construyendo
 
-Una API REST que permite:
+Una API REST conectada a MySQL que permite:
 
 - Listar libros
 - Buscar un libro por ID
@@ -57,7 +57,7 @@ Route (libros.routes.js)
    ↓
 Controller (libros.controller.js)
    ↓
-Memory (array)  ó  MySQL
+MySQL
    ↓
 HTTP Response (JSON)
    ↓
@@ -78,53 +78,13 @@ Postman
 
 ---
 
-## E. Memoria vs persistencia
+## E. Almacenamiento en MySQL
 
-### Etapa 1 — Array en memoria (RAM)
-
-Los libros se guardan en un array de JavaScript (`src/data/libros.memory.js`).
-
-> **Los libros se almacenan temporalmente en memoria RAM. Si el servidor se reinicia, los datos se pierden.**
-
-(Quedan solo los libros iniciales que están hardcodeados en el archivo.)
-
-```text
-Postman → Express → Controller → Array JS → RAM
-```
-
-### Etapa 2 — MySQL (disco)
-
-Los libros se guardan en la base de datos. Sobreviven al reinicio del servidor.
+Los libros se guardan en MySQL y permanecen allí aunque se reinicie el servidor.
 
 ```text
 Postman → Express → Controller → MySQL → Disco
 ```
-
-**Importante:** las URLs de Postman son **iguales** en ambas etapas.
-
----
-
-## F. Prueba fundamental (demostración en clase)
-
-### Con memoria (RAM)
-
-1. Ejecutar `npm run dev`
-2. Crear un libro con POST en Postman
-3. Consultarlo con GET `/libros`
-4. Modificar cualquier archivo del servidor y **guardar**
-5. Ver en la terminal que **Nodemon reinicia**
-6. Volver a hacer GET `/libros`
-7. Observar que el libro creado **desapareció**
-
-**Por qué:** Nodemon reinicia Node.js → el array se crea de nuevo → se pierden los datos nuevos.
-
-### Con MySQL
-
-1. Cambiar `USAR_MYSQL` a `true` en el controlador (ver más abajo)
-2. Crear un libro con POST
-3. Reiniciar el servidor (Ctrl+C y `npm run dev`, o guardar un archivo)
-4. Hacer GET `/libros`
-5. Comprobar que el libro **sigue existiendo**
 
 ---
 
@@ -142,7 +102,6 @@ backend-libros/
 │   ├── controllers/
 │   │   └── libros.controller.js
 │   ├── data/
-│   │   ├── libros.memory.js
 │   │   └── libros.mysql.js
 │   └── database/
 │       └── mysql.js
@@ -206,23 +165,17 @@ Para detener el servidor: **Ctrl + C**
 
 ---
 
-## Cómo ejecutar la versión en memoria
+## Ejecutar el backend
 
-1. Abrí `src/controllers/libros.controller.js`
-2. Verificá que diga:
-
-```js
-const USAR_MYSQL = false;
-```
-
-3. En la terminal:
+1. Verificá que MySQL esté iniciado y que exista la base de datos configurada.
+2. En la terminal:
 
 ```bash
 cd backend-libros
 npm run dev
 ```
 
-4. Deberías ver:
+3. Deberías ver:
 
 ```text
 Servidor ejecutándose en http://localhost:3000
@@ -315,37 +268,19 @@ Respuesta esperada: **200 OK**
 4. Andá a la pestaña **SQL**
 5. Copiá y ejecutá el contenido de `database.sql`
 6. Comprobá que exista la base `backend_libros` y la tabla `libros`
-7. En el backend, activá MySQL (paso siguiente)
-8. Probá otra vez desde Postman
+7. Configurá las variables `DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME` y `DB_PORT` en `.env`
+8. Ejecutá el backend y probá desde Postman
 
 La conexión está en `src/database/mysql.js`:
 
-- host: `localhost`
-- user: `root`
-- password: `""` (vacía, típico de XAMPP)
-- database: `backend_libros`
-
----
-
-## Cómo pasar de memoria a MySQL
-
-**Un solo cambio:**
-
-Archivo: `src/controllers/libros.controller.js`
-
-```js
-// Etapa 1 (memoria)
-const USAR_MYSQL = false;
-
-// Etapa 2 (MySQL)
-const USAR_MYSQL = true;
-```
-
-Las rutas de Postman **no cambian**.
+- host: `DB_HOST`
+- user: `DB_USER`
+- password: `DB_PASSWORD`
+- database: `DB_NAME`
+- port: `DB_PORT` (opcional; por defecto `3306`)
 
 | Archivo | Rol |
 | ------- | --- |
-| `src/data/libros.memory.js` | Array en RAM |
 | `src/data/libros.mysql.js` | Consultas SQL (`SELECT`, `INSERT`, `UPDATE`, `DELETE`) |
 | `src/database/mysql.js` | Conexión / pool con `mysql2` |
 | `database.sql` | Crear BD y tabla |
@@ -354,12 +289,7 @@ Las rutas de Postman **no cambian**.
 
 ## Comprobar persistencia con MySQL
 
-1. `USAR_MYSQL = true`
-2. XAMPP MySQL encendido
-3. `npm run dev`
-4. POST un libro nuevo en Postman
-5. GET `/libros` → aparece
-6. Reiniciá el servidor
-7. GET `/libros` otra vez → **sigue ahí**
-
-Esa comparación (desaparece en RAM / permanece en MySQL) es el corazón de la demostración.
+1. Asegurate de que MySQL esté encendido y el `.env` tenga los datos de conexión correctos.
+2. Ejecutá `npm run dev`.
+3. Creá un libro con POST en Postman y consultá con GET `/libros`.
+4. Reiniciá el servidor y consultá nuevamente: el libro debe seguir en la base de datos.

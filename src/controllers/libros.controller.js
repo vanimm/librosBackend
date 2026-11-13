@@ -1,15 +1,4 @@
-// ============================================================
-// INTERRUPTOR DIDÁCTICO
-// false = memoria RAM (Etapa 1)
-// true  = MySQL con XAMPP (Etapa 2)
-// Las URLs de Postman NO cambian.
-// ============================================================
-const USAR_MYSQL = true;
-
-const librosMemory = require("../data/libros.memory");
-const librosMysql = require("../data/libros.mysql");
-
-const datos = USAR_MYSQL ? librosMysql : librosMemory;
+import * as datos from "../data/libros.mysql.js";
 
 function validarLibro(body) {
   const { titulo, autor, editorial } = body;
@@ -52,7 +41,7 @@ function validarCambiosLibro(body) {
   return null;
 }
 
-async function obtenerLibros(req, res) {
+export async function obtenerLibros(req, res) {
   try {
     const libros = await datos.obtenerTodos();
     res.status(200).json(libros);
@@ -62,7 +51,7 @@ async function obtenerLibros(req, res) {
   }
 }
 
-async function obtenerLibroPorId(req, res) {
+export async function obtenerLibroPorId(req, res) {
   try {
     const id = Number(req.params.id);
 
@@ -83,7 +72,7 @@ async function obtenerLibroPorId(req, res) {
   }
 }
 
-async function crearLibro(req, res) {
+export async function crearLibro(req, res) {
   try {
     const errorValidacion = validarLibro(req.body);
     if (errorValidacion) {
@@ -102,7 +91,7 @@ async function crearLibro(req, res) {
   }
 }
 
-async function actualizarLibro(req, res) {
+export async function actualizarLibro(req, res) {
   try {
     const id = Number(req.params.id);
 
@@ -131,7 +120,7 @@ async function actualizarLibro(req, res) {
   }
 }
 
-async function actualizarLibroParcial(req, res) {
+export async function actualizarLibroParcial(req, res) {
   try {
     const id = Number(req.params.id);
 
@@ -165,7 +154,7 @@ async function actualizarLibroParcial(req, res) {
   }
 }
 
-async function eliminarLibro(req, res) {
+export async function eliminarLibro(req, res) {
   try {
     const id = Number(req.params.id);
 
@@ -185,12 +174,3 @@ async function eliminarLibro(req, res) {
     res.status(500).json({ mensaje: "Error interno del servidor" });
   }
 }
-
-module.exports = {
-  obtenerLibros,
-  obtenerLibroPorId,
-  crearLibro,
-  actualizarLibro,
-  actualizarLibroParcial,
-  eliminarLibro,
-};

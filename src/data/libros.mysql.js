@@ -1,13 +1,13 @@
-const pool = require("../database/mysql");
+import pool from "../database/mysql.js";
 
-async function obtenerTodos() {
+export async function obtenerTodos() {
   const [filas] = await pool.query(
     "SELECT id, titulo, autor, editorial FROM libros"
   );
   return filas;
 }
 
-async function obtenerPorId(id) {
+export async function obtenerPorId(id) {
   const [filas] = await pool.query(
     "SELECT id, titulo, autor, editorial FROM libros WHERE id = ?",
     [id]
@@ -15,7 +15,7 @@ async function obtenerPorId(id) {
   return filas[0] || null;
 }
 
-async function crear(datos) {
+export async function crear(datos) {
   const [resultado] = await pool.query(
     "INSERT INTO libros (titulo, autor, editorial) VALUES (?, ?, ?)",
     [datos.titulo, datos.autor, datos.editorial]
@@ -29,7 +29,7 @@ async function crear(datos) {
   };
 }
 
-async function actualizar(id, datos) {
+export async function actualizar(id, datos) {
   const [resultado] = await pool.query(
     "UPDATE libros SET titulo = ?, autor = ?, editorial = ? WHERE id = ?",
     [datos.titulo, datos.autor, datos.editorial, id]
@@ -47,12 +47,12 @@ async function actualizar(id, datos) {
   };
 }
 
-async function eliminar(id) {
+export async function eliminar(id) {
   const [resultado] = await pool.query("DELETE FROM libros WHERE id = ?", [id]);
   return resultado.affectedRows > 0;
 }
 
-module.exports = {
+export default {
   obtenerTodos,
   obtenerPorId,
   crear,
